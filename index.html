@@ -1,44 +1,163 @@
 <!DOCTYPE html>
-<html>
+<html lang="fr">
 <head>
-  <meta charset="UTF-8">
-  <title>Test enchère</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8">
+<title>Click&Win - Enchères</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+body { font-family:sans-serif; margin:0; background:#f0f8ff; text-align:center; padding:20px; }
+header { background:#00bcd4; color:white; padding:20px 0; font-size:28px; font-weight:bold; margin-bottom:20px; }
+.auction-container { display:flex; justify-content:center; gap:20px; flex-wrap:wrap; }
+.auction-item { background:white; border-radius:15px; padding:15px; width:250px; box-shadow:0 6px 12px rgba(0,0,0,0.1); display:none; }
+.auction-item img { width:100%; border-radius:10px; margin-bottom:10px; }
+h3 { margin:10px 0 5px 0; font-size:18px; }
+p { font-size:14px; margin:5px 0; color:#555; }
+h1 { margin:10px 0; color:#ff5722; }
+button { font-size:16px; padding:10px 15px; margin:5px 0; border:none; border-radius:8px; cursor:pointer; }
+.blockBtn { background:#00bcd4; color:white; }
+.blockBtn:hover { background:#0097a7; }
+.payBtn { background:#4caf50; color:white; }
+.payBtn:hover { background:#388e3c; }
+.timer { font-weight:bold; font-size:16px; margin-top:5px; }
+.info { font-size:14px; margin-top:5px; }
+@media(max-width:600px){ .auction-item { width:90%; } }
+</style>
 </head>
-<body style="text-align:center; font-family: Arial; padding:20px;">
+<body>
 
-  <h2>Test enchère</h2>
+<header>Click&Win</header>
 
-  <h1 id="price">200 €</h1>
+<div class="auction-container">
+  <!-- Objets initiaux -->
+  <div class="auction-item" data-start-price="200"><img src="https://via.placeholder.com/250x150?text=Smartphone">
+    <h3>Smartphone</h3><p>Haut de gamme 108MP</p>
+    <h1 class="price">200 €</h1>
+    <button class="blockBtn">Bloquer</button>
+    <button class="payBtn" style="display:none;">Payer</button>
+    <p class="info">Le prix descend tout seul</p>
+    <p class="timer"></p>
+  </div>
 
-  <button id="blockBtn" style="font-size:22px; padding:15px 30px; margin-top:20px;">
-    Bloquer l’objet
-  </button>
+  <div class="auction-item" data-start-price="150"><img src="https://via.placeholder.com/250x150?text=Disney+Paris">
+    <h3>Disneyland</h3><p>Week-end 2 personnes</p>
+    <h1 class="price">150 €</h1>
+    <button class="blockBtn">Bloquer</button>
+    <button class="payBtn" style="display:none;">Payer</button>
+    <p class="info">Le prix descend tout seul</p>
+    <p class="timer"></p>
+  </div>
+</div>
 
-  <p id="info">Le prix descend tout seul</p>
+<script>
+// Config
+const itemsData = [
+  {name:'Smartphone', price:200, desc:'Haut de gamme 108MP', img:'https://via.placeholder.com/250x150?text=Smartphone'},
+  {name:'Disneyland', price:150, desc:'Week-end 2 personnes', img:'https://via.placeholder.com/250x150?text=Disney+Paris'},
+  {name:'TV', price:300, desc:'TV 55 pouces 4K', img:'https://via.placeholder.com/250x150?text=TV'},
+  {name:'Console', price:400, desc:'Console dernière génération', img:'https://via.placeholder.com/250x150?text=Console+de+jeux'}
+];
+const minPrice = 10;
+const countdownBeforeNext = 5; // secondes
+const priceIntervalMs = 300;
 
-  <script>
-    // Variables
-    let price = 200;
-    let minPrice = 80;
-    let blocked = false;
+let auctionItems = Array.from(document.querySelectorAll('.auction-item'));
+let rotationQueue = itemsData.slice(2); // les objets qui arriveront après
+auctionItems.forEach(initItem);
 
-    // Descente du prix toutes les 0,3 secondes
-    let priceInterval = setInterval(function() {
-      if (!blocked && price > minPrice) {
-        price--;
-        document.getElementById("price").innerText = price + " €";
+function initItem(item){
+  resetItem(item);
+  startPriceDrop(item);
+  const blockBtn = item.querySelector('.blockBtn');
+  const payBtn = item.querySelector('.payBtn');
+
+  blockBtn.onclick = ()=>{
+    item.dataset.blocked='true';
+    clearInterval(item.priceInterval);
+    blockBtn.style.display='none';
+    payBtn.style.display='inline-block';
+    item.querySelector('.info').innerText="✅ Objet bloqué à "+item.dataset.price+" €";
+    startCountdown(item);
+  }
+
+  payBtn.onclick = ()=>{
+    clearInterval(item.countdown);
+    item.querySelector('.info').innerText="💰 Paiement simulé effectué à "+item.dataset.price+" € !";
+    item.querySelector('.timer').innerText='';
+  }
+}
+
+function resetItem(item){
+  clearInterval(item.priceInterval);
+  clearInterval(item.countdown);
+  const startPrice = parseInt(item.dataset.startPrice);
+  item.dataset.price=startPrice;
+  item.dataset.blocked='false';
+  item.dataset.timeLeft=30;
+  item.querySelector('.price').innerText=startPrice+' €';
+  item.querySelector('.timer').innerText='';
+  item.querySelector('.info').innerText="Le prix descend tout seul";
+  item.querySelector('.blockBtn').style.display='inline-block';
+  item.querySelector('.payBtn').style.display='none';
+}
+
+function startPriceDrop(item){
+  item.priceInterval = setInterval(()=>{
+    if(item.dataset.blocked==='false'){
+      let price = parseInt(item.dataset.price)-1;
+      if(price<=minPrice){
+        clearInterval(item.priceInterval);
+        startNextAfterDelay(item);
+        return;
       }
-    }, 300);
+      item.dataset.price=price;
+      item.querySelector('.price').innerText=price+' €';
+    }
+  }, priceIntervalMs);
+}
 
-    // Bouton bloquer
-    document.getElementById("blockBtn").onclick = function() {
-      blocked = true;
-      clearInterval(priceInterval); // Stop la descente
-      document.getElementById("blockBtn").style.display = "none";
-      document.getElementById("info").innerText = "✅ Objet bloqué à " + price + " €";
-    };
-  </script>
+function startCountdown(item){
+  item.countdown = setInterval(()=>{
+    let t = parseInt(item.dataset.timeLeft)-1;
+    item.dataset.timeLeft=t;
+    item.querySelector('.timer').innerText="⏳ Temps restant : 0:"+(t<10?'0'+t:t);
+    if(t<=0){
+      clearInterval(item.countdown);
+      startNextAfterDelay(item);
+    }
+  },1000);
+}
+
+function startNextAfterDelay(item){
+  item.style.display='none';
+  if(rotationQueue.length>0){
+    let nextData = rotationQueue.shift();
+    const newItem = document.createElement('div');
+    newItem.className='auction-item';
+    newItem.dataset.startPrice = nextData.price;
+    newItem.innerHTML=`
+      <img src="${nextData.img}" alt="${nextData.name}">
+      <h3>${nextData.name}</h3>
+      <p>${nextData.desc}</p>
+      <h1 class="price">${nextData.price} €</h1>
+      <button class="blockBtn">Bloquer</button>
+      <button class="payBtn" style="display:none;">Payer</button>
+      <p class="info">Le prix descend tout seul</p>
+      <p class="timer"></p>
+    `;
+    document.querySelector('.auction-container').appendChild(newItem);
+    rotationQueue.push(nextData); // remettre l'objet à la fin pour rotation infinie
+    initItem(newItem);
+    newItem.style.display='block';
+  } else {
+    // Si aucun objet restant, remettre l'objet actuel après 5 sec
+    setTimeout(()=>{
+      resetItem(item);
+      item.style.display='block';
+      startPriceDrop(item);
+    }, countdownBeforeNext*1000);
+  }
+}
+</script>
 
 </body>
 </html>
