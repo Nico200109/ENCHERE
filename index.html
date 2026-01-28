@@ -13,22 +13,32 @@
 
   <h1 id="price">200 €</h1>
 
-  <p>Le prix baisse automatiquement toutes les 0,3 secondes</p>
+  <p id="info">Le prix baisse automatiquement toutes les 0,3 secondes</p>
 
-  <button style="font-size:22px; padding:15px 30px;">
+  <button id="blockBtn" style="font-size:22px; padding:15px 30px;">
     Bloquer l’objet
   </button>
 
   <script>
     let price = 200;
     let minPrice = 80;
+    let blocked = false;
 
-    setInterval(function() {
-      if (price > minPrice) {
+    let timer = setInterval(function() {
+      if (price > minPrice && !blocked) {
         price = price - 1;
         document.getElementById("price").innerText = price + " €";
       }
     }, 300);
+
+    document.getElementById("blockBtn").addEventListener("click", function() {
+      blocked = true;
+      clearInterval(timer);
+
+      document.getElementById("blockBtn").style.display = "none";
+      document.getElementById("info").innerText =
+        "✅ Objet bloqué à " + price + " € pendant 10 minutes";
+    });
   </script>
 
 </body>
