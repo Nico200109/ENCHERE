@@ -18,28 +18,3 @@
 
   <button id="blockBtn" style="font-size:22px; padding:15px 30px;">
     Bloquer l’objet
-  </button>
-
-  <script>
-    let startPrice = 200;
-    let price = startPrice;
-    let minPrice = 80;
-
-    let blocked = false;
-    let priceTimer;
-    let countdownTimer;
-    let timeLeft = 0; // 0 minutes
-
-    function startPriceDrop() {
-      priceTimer = setInterval(function() {
-        if (price > minPrice && !blocked) {
-          price--;
-          document.getElementById("price").innerText = price + " €";
-        }
-      }, 300);
-    }
-
-    function startCountdown() {
-      document.getElementById("timer").innerText = "⏳ Temps restant : 10:00";
-
-      countdown
