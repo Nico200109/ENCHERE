@@ -2,7 +2,7 @@
 <html>
 <head>
   <meta charset="UTF-8">
-  <title>Test prix décroissant</title>
+  <title>Test prix décroissant + blocage</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
 <body style="text-align:center; font-family: Arial; padding:20px;">
@@ -11,19 +11,26 @@
 
   <h1 id="price">200 €</h1>
 
-  <p>Le prix descend tout seul</p>
+  <p id="info">Le prix descend tout seul</p>
+
+  <button id="blockBtn" style="font-size:22px; padding:15px 30px; margin-top:20px;">
+    Bloquer l’objet
+  </button>
 
   <script>
     let price = 200;
     let minPrice = 80;
+    let blocked = false;
 
-    setInterval(function() {
-      if (price > minPrice) {
+    // Descente automatique du prix
+    let priceTimer = setInterval(function() {
+      if (!blocked && price > minPrice) {
         price--;
         document.getElementById("price").innerText = price + " €";
       }
-    }, 300); // toutes les 0,3 secondes
-  </script>
+    }, 300);
 
-</body>
-</html>
+    // Bouton bloquer
+    document.getElementById("blockBtn").addEventListener("click", function() {
+      blocked = true;             // on bloque le prix
+      clearInterval(priceTimer);  // on arrête la
