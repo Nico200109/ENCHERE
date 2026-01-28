@@ -18,19 +18,31 @@
   </button>
 
   <script>
+    // Variables de base
     let price = 200;
     let minPrice = 80;
     let blocked = false;
 
-    // Descente automatique du prix
-    let priceTimer = setInterval(function() {
+    // Fonction pour faire descendre le prix
+    function decreasePrice() {
       if (!blocked && price > minPrice) {
         price--;
         document.getElementById("price").innerText = price + " €";
       }
-    }, 300);
+    }
 
-    // Bouton bloquer
-    document.getElementById("blockBtn").addEventListener("click", function() {
-      blocked = true;             // on bloque le prix
-      clearInterval(priceTimer);  // on arrête la
+    // Descente automatique toutes les 0,3 secondes
+    let priceInterval = setInterval(decreasePrice, 300);
+
+    // Bouton pour bloquer le prix
+    document.getElementById("blockBtn").onclick = function() {
+      blocked = true;                     // On bloque le prix
+      clearInterval(priceInterval);       // On arrête la descente
+      document.getElementById("blockBtn").style.display = "none"; // Bouton disparaît
+      document.getElementById("info").innerText =
+        "✅ Objet bloqué à " + price + " €";
+    };
+  </script>
+
+</body>
+</html>
