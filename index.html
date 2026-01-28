@@ -2,45 +2,41 @@
 <html>
 <head>
   <meta charset="UTF-8">
-  <title>Test prix décroissant + blocage</title>
+  <title>Test enchère</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
 <body style="text-align:center; font-family: Arial; padding:20px;">
 
-  <h2>Test prix décroissant</h2>
+  <h2>Test enchère</h2>
 
   <h1 id="price">200 €</h1>
-
-  <p id="info">Le prix descend tout seul</p>
 
   <button id="blockBtn" style="font-size:22px; padding:15px 30px; margin-top:20px;">
     Bloquer l’objet
   </button>
 
+  <p id="info">Le prix descend tout seul</p>
+
   <script>
-    // Variables de base
+    // Variables
     let price = 200;
     let minPrice = 80;
     let blocked = false;
 
-    // Fonction pour faire descendre le prix
-    function decreasePrice() {
+    // Descente du prix toutes les 0,3 secondes
+    let priceInterval = setInterval(function() {
       if (!blocked && price > minPrice) {
         price--;
         document.getElementById("price").innerText = price + " €";
       }
-    }
+    }, 300);
 
-    // Descente automatique toutes les 0,3 secondes
-    let priceInterval = setInterval(decreasePrice, 300);
-
-    // Bouton pour bloquer le prix
+    // Bouton bloquer
     document.getElementById("blockBtn").onclick = function() {
-      blocked = true;                     // On bloque le prix
-      clearInterval(priceInterval);       // On arrête la descente
-      document.getElementById("blockBtn").style.display = "none"; // Bouton disparaît
-      document.getElementById("info").innerText =
-        "✅ Objet bloqué à " + price + " €";
+      blocked = true;
+      clearInterval(priceInterval); // Stop la descente
+      document.getElementById("blockBtn").style.display = "none";
+      document.getElementById("info").innerText = "✅ Objet bloqué à " + price + " €";
     };
   </script>
 
