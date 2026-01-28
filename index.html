@@ -2,44 +2,28 @@
 <html>
 <head>
   <meta charset="UTF-8">
-  <title>Offre en cours</title>
+  <title>Test prix décroissant</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
+<body style="text-align:center; font-family: Arial; padding:20px;">
 
-<body style="font-family: Arial; text-align:center; padding:20px;">
-
-  <h2>Offre spéciale</h2>
+  <h2>Test prix décroissant</h2>
 
   <h1 id="price">200 €</h1>
 
-  <p id="info">Le prix baisse automatiquement toutes les 0,3 secondes</p>
-
-  <p id="timer" style="font-size:20px; font-weight:bold;"></p>
-
-  <button id="blockBtn" style="font-size:22px; padding:15px 30px;">
-    Bloquer l’objet
-  </button>
+  <p>Le prix descend tout seul</p>
 
   <script>
-    let startPrice = 200;
+    let price = 200;
     let minPrice = 80;
 
-    let price;
-    let blocked;
-    let priceTimer;
-    let countdownTimer;
-    let timeLeft;
+    setInterval(function() {
+      if (price > minPrice) {
+        price--;
+        document.getElementById("price").innerText = price + " €";
+      }
+    }, 300); // toutes les 0,3 secondes
+  </script>
 
-    function startPriceDrop() {
-      priceTimer = setInterval(function() {
-        if (!blocked && price > minPrice) {
-          price--;
-          document.getElementById("price").innerText = price + " €";
-        }
-      }, 300);
-    }
-
-    function startCountdown() {
-      document.getElementById("timer").innerText = "⏳ Temps restant : 0:30";
-
-      countdownTimer = setInterval(function() {
+</body>
+</html>
